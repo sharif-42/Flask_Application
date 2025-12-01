@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bank.name }} - Bank Details{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 20px; color: #333;">Bank Details</h2>
+    
+    <table style="margin-top: 0;">
+        <tr>
+            <th style="width: 200px;">ID</th>
+            <td>{{ bank.id }}</td>
+        </tr>
+        <tr>
+            <th>Bank Name</th>
+            <td><strong>{{ bank.name }}</strong></td>
+        </tr>
+        <tr>
+            <th>Location</th>
+            <td>{{ bank.location }}</td>
+        </tr>
+        <tr>
+            <th>Created At</th>
+            <td>{{ bank.created_at.strftime('%Y-%m-%d %H:%M:%S') if bank.created_at else 'N/A' }}</td>
+        </tr>
+        <tr>
+            <th>Last Updated</th>
+            <td>{{ bank.updated_at.strftime('%Y-%m-%d %H:%M:%S') if bank.updated_at else 'N/A' }}</td>
+        </tr>
+    </table>
+    
+    <div style="margin-top: 30px;">
+        <a href="/banks/{{ bank.id }}/edit" class="btn">Edit Bank</a>
+        <a href="/" class="btn btn-secondary" style="margin-left: 10px;">Back to List</a>
+        <form action="/banks/{{ bank.id }}/delete" method="POST" style="display: inline; margin-left: 10px;" 
+              onsubmit="return confirm('Are you sure you want to delete {{ bank.name }}?');">
+            <button type="submit" class="btn btn-danger">Delete Bank</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Bank - Bank Management System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 20px; color: #333;">Edit Bank</h2>
+    
+    <form method="POST" action="/banks/{{ bank.id }}/edit">
+        <div class="form-group">
+            <label for="name">Bank Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Enter bank name" 
+                   value="{{ request.form.name or bank.name }}">
+        </div>
+        
+        <div class="form-group">
+            <label for="location">Location *</label>
+            <input type="text" id="location" name="location" required placeholder="Enter bank location" 
+                   value="{{ request.form.location or bank.location }}">
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button type="submit" class="btn">Update Bank</button>
+            <a href="/banks/{{ bank.id }}" class="btn btn-secondary" style="margin-left: 10px;">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+services:
+  # SQL Server Database Service
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: flask_sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SQL_PASSWORD:-YourStrong@Passw0rd}
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - flask_network
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}" -Q "SELECT 1" -C || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # Flask Application Service
+  flask_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    environment:
+      - FLASK_APP=flaskr
+      - FLASK_ENV=${FLASK_ENV:-development}
+      - SQL_DRIVER=ODBC Driver 18 for SQL Server
+      - SQL_SERVER=sqlserver
+      - SQL_DATABASE=${SQL_DATABASE:-flaskr_db}
+      - SQL_USERNAME=${SQL_USERNAME:-sa}
+      - SQL_PASSWORD=${SQL_PASSWORD:-YourStrong@Passw0rd}
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - flask_network
+    command: flask run --host=0.0.0.0
+
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  flask_network:
+    driver: bridge
